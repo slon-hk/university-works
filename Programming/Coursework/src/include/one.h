@@ -1,0 +1,1 @@
+void print_sum_time(char *text);

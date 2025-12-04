@@ -1,0 +1,1 @@
+char *remove_equal_length_sentences(char *str);

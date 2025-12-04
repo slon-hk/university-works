@@ -1,0 +1,1 @@
+char *del_first_sentence(char *str);

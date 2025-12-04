@@ -1,0 +1,1 @@
+char *pred_obrabotka(char *str);
