@@ -1,0 +1,5 @@
+#ifndef OOP_PROJECT_GAME_TEMPLATE_H
+#define OOP_PROJECT_GAME_TEMPLATE_H
+
+
+#endif
