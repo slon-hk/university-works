@@ -1,0 +1,1352 @@
+@startuml
+!pragma layout smetana
+skinparam dpi 110
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam defaultFontName Helvetica
+skinparam classFontSize 13
+skinparam classAttributeFontSize 11
+skinparam ArrowColor #555555
+skinparam classBorderColor #666666
+skinparam classBackgroundColor #FFFFFF
+hide empty members
+left to right direction
+title <size:28>Lab 3 — полная диаграмма классов</size>\n<size:14>сгенерирована по заголовкам src/**/includes/*.h</size>
+
+package "program — запуск" as pkg_program #FDECC8 {
+  class Command_line_options {
+    -log_settings_ : Log_settings
+    -error_ : string
+    -parse_argument(const string& argument) : void
+    +Command_line_options(int argc, char* argv[])
+    +get_log_settings() const : const Log_settings&
+    +get_error() const : const string&
+  }
+  class Program {
+    -options_ : Command_line_options
+    -run_loop(Program_logger& logger) : void
+    +Program(int argc, char* argv[])
+    +run() : void
+  }
+}
+
+package "game — приложение и логика уровней" as pkg_game #DCEBFA {
+  class Application {
+    -save_slot_ : Save_slot
+    -logger_ : Logger&
+    -game_listener_ : Game_log_listener
+    -modes_ : Game_mode_catalog
+    -slots_ : Command_slots
+    -game_ : unique_ptr<Game>
+    -screen_ : Screen
+    -message_title_ : string
+    -message_text_ : string
+    -notification_ : string
+    -running_ : bool
+    -pending_mode_ : int
+    -handle_menu(Command command) : void
+    -handle_difficulty(Command command) : void
+    -handle_game(Command command) : void
+    -enter_game(unique_ptr<Game> game, const string& event) : void
+    -save_game() : void
+    -load_game(string& error) : bool
+    -load_in_game() : void
+    -describe_game() const : string
+    +Application(const string& save_path, Logger& logger)
+    +handle(Command command) : void
+    +show_message(const string& title, const string& text) : void
+    +is_running() const : bool
+    +get_screen() const : Screen
+    +has_save() const : bool
+    +get_pending_mode() const : int
+    +get_message_title() const : const string&
+    +get_message_text() const : const string&
+    +get_notification() const : const string&
+    +get_game() const : const Game&
+  }
+  enum Command {
+    Move_up
+    Move_down
+    Move_left
+    Move_right
+    Use_ability
+    Cancel
+    End_turn
+    Ability_1
+    Ability_2
+    Ability_3
+    Ability_4
+    Item_1
+    Item_2
+    Item_3
+    Item_4
+    Item_5
+    Item_6
+    Switch_display
+    Menu
+    Save
+    Load
+    Quit
+  }
+  class Command_slots {
+    +get_ability_slot_count() const : int
+    +get_item_slot_count() const : int
+    +is_ability(Command command) const : bool
+    +is_item(Command command) const : bool
+    +get_ability_slot(Command command) const : int
+    +get_item_slot(Command command) const : int
+    +get_ability_command(int slot) const : Command
+    +get_item_command(int slot) const : Command
+  }
+  class Difficulty {
+    -level_ : Difficulty_level
+    -modifiers_ : vector<Modifier>
+    +Difficulty()
+    +Difficulty(Difficulty_level level)
+    +Difficulty(Difficulty_level level, const vector<Modifier>& modifiers)
+    +get_level() const : Difficulty_level
+    +get_name() const : string
+    +get_enemy_power_percent() const : int
+    +has_modifier(Modifier modifier) const : bool
+    +get_modifiers() const : const vector<Modifier>&
+    +get_modifier_description(Modifier modifier) const : string
+  }
+  enum Difficulty_level {
+    Easy
+    Normal
+    Hard
+  }
+  enum Display_mode {
+    Standard
+    Enemies
+    Obstacles
+    Status_cells
+  }
+  class Display_mode_selector {
+    -mode_ : Display_mode
+    +Display_mode_selector()
+    +get_mode() const : Display_mode
+    +get_name() const : string
+    +next() : void
+  }
+  class Enemy_controller {
+    -sees_player(const Game_session& session, int index) const : bool
+    -use_abilities(Game_session& session, int index) const : void
+    -teleport_to_player(Game_session& session, int index, int ability_index) const : void
+    -act(Game_session& session, int index) const : void
+    -step_towards_player(Game_session& session, int index) const : bool
+    -step_randomly(Game_session& session, int index) const : bool
+    +run_turn(Game_session& session) const : void
+  }
+  class Event_log {
+    -capacity_ : size_t
+    -entries_ : vector<string>
+    +Event_log(size_t capacity)
+    +add(const string& text) : void
+    +clear() : void
+    +get_capacity() const : size_t
+    +get_entries() const : const vector<string>&
+  }
+  class Event_reporter {
+    -log_ : Event_log
+    -listener_ : Game_event_listener*
+    -notify(Game_event_type type, const string& text) const : void
+    +Event_reporter()
+    +info(const string& text) : void
+    +error(const string& text) : void
+    +trace(const string& text) const : void
+    +set_listener(Game_event_listener* listener) : void
+    +get_log() const : const Event_log&
+    +restore_log(const vector<string>& entries) : void
+  }
+  class Factory_roster {
+    -factories_ : vector<Placed_factory>
+    +add(const Robot_factory& factory, int x, int y) : void
+    +remove(int index) : void
+    +get_count() const : int
+    +get_factory(int index) : Robot_factory&
+    +get_factory(int index) const : const Robot_factory&
+    +get_x(int index) const : int
+    +get_y(int index) const : int
+    +find_at(int x, int y) const : int
+    +has_enemy_factories() const : bool
+  }
+  class File_level_generator {
+    -directory_ : string
+    +File_level_generator()
+    +File_level_generator(const string& directory)
+    +get_name() const : string
+    +create(int level_number, const Difficulty& difficulty) const : Game_session
+  }
+  abstract class Game {
+    +Game()
+    +{abstract} start_new(const Difficulty& difficulty) : void
+    +{abstract} handle(Command command) : void
+    +{abstract} get_phase() const : Game_phase
+    +{abstract} get_level() const : int
+    +{abstract} get_level_count() const : int
+    +{abstract} get_session() const : const Game_session&
+    +{abstract} get_controller() const : const Player_controller&
+    +{abstract} get_display_mode() const : const Display_mode_selector&
+    +{abstract} set_event_listener(Game_event_listener* listener) : void
+    +{abstract} get_mode_name() const : string
+    +{abstract} can_act() const : bool
+    +{abstract} restore(int level, unique_ptr<Game_session> session, int selected_slot, bool ability_switched) : void
+  }
+  abstract class Game_event_listener {
+    +Game_event_listener()
+    +{abstract} on_game_event(Game_event_type type, const string& text) : void
+  }
+  enum Game_event_type {
+    Info
+    Error
+  }
+  class Game_mode_catalog {
+    +get_count() const : int
+    +get_title(int index) const : string
+    +create(int index) const : unique_ptr<Game>
+    +create_new(int index, const Difficulty& difficulty, Game_event_listener* listener) const : unique_ptr<Game>
+    +create_by_name(const string& mode) const : unique_ptr<Game>
+  }
+  enum Game_phase {
+    Start_ability
+    Playing
+    Level_complete
+    Game_over
+    Victory
+    Finished
+  }
+  class Game_session {
+    -board_ : Game_board
+    -robots_ : Robot_roster
+    -factories_ : Factory_roster
+    -ability_catalog_ : Ability_catalog
+    -enemy_controller_ : Enemy_controller
+    -inventory_ : Inventory
+    -reporter_ : Event_reporter
+    -rewards_ : Rank_rewards
+    -turn_ : int
+    -difficulty_ : Difficulty
+    -player_used_ability_ : bool
+    +{static} kPlayerIndex : int
+    -find_free_cell_around(int factory_index, int& out_x, int& out_y) const : bool
+    -attack_factory(int index, int factory_index, const string& target_cell) : bool
+    -interact(int index, int target_index) : bool
+    -step(int index, int x, int y, const string& target_cell) : bool
+    -enter_cell(int index) : void
+    -process_statuses() : void
+    -spawn_from_factories() : void
+    -restore_robots() : void
+    -apply_random_status_to_player() : void
+    -report_rank_up(int index, size_t rank_before) : void
+    -log_health_loss(const string& prefix, int target_index, int health_before, int damage) : void
+    +Game_session(Game_board board)
+    +add_robot(Robot robot, int x, int y) : void
+    +add_factory(Robot_factory factory, int x, int y) : void
+    +restore_robot(Robot robot, int x, int y, vector<shared_ptr<Robot_abilities>> abilities) : void
+    +restore_progress(int turn, int rewarded_rank, bool player_used_ability) : void
+    +restore_inventory(const Inventory& inventory) : void
+    +restore_log(const vector<string>& entries) : void
+    +set_difficulty(const Difficulty& difficulty) : void
+    +get_difficulty() const : const Difficulty&
+    +is_ability_limit_reached(int index) const : bool
+    +has_player_used_ability() const : bool
+    +move_player(Direction direction) : bool
+    +act(int index, Direction direction) : bool
+    +end_turn() : void
+    +update_visibility() : void
+    +get_turn() const : int
+    +is_level_complete() const : bool
+    +is_game_over() const : bool
+    +get_board() const : const Game_board&
+    +get_robots() const : const Robot_roster&
+    +get_factories() const : const Factory_roster&
+    +is_inside_board(int x, int y) const : bool
+    +is_passable(int x, int y) const : bool
+    +is_cell_free(int x, int y) const : bool
+    +add_ability(int index, shared_ptr<Robot_abilities> ability) : void
+    +use_ability(int user_index, int ability_index, int target_x, int target_y) : bool
+    +heal_robot(int index, int heal_amount) : void
+    +restore_energy(int index, int amount) : void
+    +deal_damage(int user_index, int target_index, int damage) : void
+    +move_robot(int index, int x, int y) : void
+    +apply_status(int index, shared_ptr<Robot_status> status) : void
+    +damage_factory(int user_index, int factory_index, int damage) : void
+    +has_rank_reward() const : bool
+    +get_rewarded_rank() const : int
+    +learn_ability(shared_ptr<Robot_abilities> ability) : bool
+    +upgrade_ability(int ability_index) : bool
+    +add_item(shared_ptr<Item> item) : bool
+    +use_item(int slot) : bool
+    +get_inventory() const : const Inventory&
+    +get_player_state() const : Player_state
+    +set_player_state(const Player_state& state) : void
+    +log_event(const string& text) : void
+    +log_error(const string& text) : void
+    +trace_event(const string& text) const : void
+    +set_event_listener(Game_event_listener* listener) : void
+    +get_log() const : const Event_log&
+  }
+  class Game_template<Level_generator, Level_count> {
+    -generator_ : Level_generator
+    -slots_ : Command_slots
+    -difficulty_ : Difficulty
+    -level_ : int
+    -session_ : unique_ptr<Game_session>
+    -controller_ : unique_ptr<Player_controller>
+    -display_mode_ : Display_mode_selector
+    -phase_ : Game_phase
+    -listener_ : Game_event_listener*
+    -is_endless() const : bool
+    -get_level_title() const : string
+    -start_level(const Player_state& player) : void
+    -start_next_level() : void
+    -handle_start_ability(Command command) : void
+    -handle_playing(Command command) : void
+    +Game_template()
+    +start_new(const Difficulty& difficulty) : void
+    +handle(Command command) : void
+    +get_phase() const : Game_phase
+    +get_level() const : int
+    +get_level_count() const : int
+    +get_session() const : const Game_session&
+    +get_controller() const : const Player_controller&
+    +get_display_mode() const : const Display_mode_selector&
+    +set_event_listener(Game_event_listener* listener) : void
+    +get_mode_name() const : string
+    +can_act() const : bool
+    +restore(int level, unique_ptr<Game_session> session, int selected_slot, bool ability_switched) : void
+  }
+  class Key_labels {
+    -labels_ : map<Command, string>
+    -slots_ : Command_slots
+    +set(Command command, const string& key) : void
+    +has(Command command) const : bool
+    +get(Command command) const : const string&
+    +get_ability(int slot) const : const string&
+    +get_item(int slot) const : const string&
+    +get_all() const : const map<Command, string>&
+  }
+  class Map_editor {
+    -board_ : Game_board
+    -player_ : vector<Robot_unit>
+    -robots_ : vector<Robot_unit>
+    -factories_ : vector<Placed_factory>
+    -status_generator_ : Cell_status_generator
+    +Map_editor(int width, int height)
+    +add_obstacle(int x, int y) : void
+    +add_speed_level(int x, int y, int level) : void
+    +add_slow_cell(int x, int y) : void
+    +add_cell_status(int x, int y, shared_ptr<Robot_status> status) : void
+    +set_status_chances(int one_status_chance, int two_status_chance) : void
+    +set_player(Robot robot, int x, int y) : void
+    +add_robot(Robot robot, int x, int y) : void
+    +add_factory(Robot_factory factory, int x, int y) : void
+    +build() const : Game_session
+  }
+  enum Modifier {
+    Single_ability_per_turn
+    Random_status_each_turn
+    Statuses_persist
+    No_ability_upgrades
+  }
+  class Placed_factory {
+    -factory_ : Robot_factory
+    -x_ : int
+    -y_ : int
+    +Placed_factory(const Robot_factory& factory, int x, int y)
+    +get_factory() : Robot_factory&
+    +get_factory() const : const Robot_factory&
+    +get_x() const : int
+    +get_y() const : int
+    +covers(int x, int y) const : bool
+  }
+  class Player_controller {
+    -session_ : Game_session&
+    -catalog_ : Ability_catalog
+    -selected_slot_ : int
+    -targeting_ : bool
+    -cursor_x_ : int
+    -cursor_y_ : int
+    -ability_switched_ : bool
+    -level_complete_reported_ : bool
+    -move_cursor(Direction direction) : void
+    -can_act() const : bool
+    -report_level_complete() : void
+    -after_action() : void
+    +Player_controller(Game_session& session)
+    +get_catalog() const : const Ability_catalog&
+    +get_selected_slot() const : int
+    +get_selected_ability_index() const : int
+    +is_targeting() const : bool
+    +get_cursor_x() const : int
+    +get_cursor_y() const : int
+    +is_ability_switched() const : bool
+    +restore(int selected_slot, bool ability_switched) : void
+    +choose_start_ability(int slot) : void
+    +select_ability(int slot) : void
+    +activate_selected_ability() : void
+    +use_ability_at(int x, int y) : void
+    +cancel_targeting() : void
+    +move(Direction direction) : void
+    +use_item(int slot) : void
+    +choose_rank_reward(int slot) : void
+    +end_turn() : void
+  }
+  class Player_state {
+    +{static} kInventoryCapacity : size_t
+    -robot_ : Robot
+    -abilities_ : vector<shared_ptr<Robot_abilities>>
+    -inventory_ : Inventory
+    +Player_state()
+    +Player_state(const Robot& robot, const vector<shared_ptr<Robot_abilities>>& abilities, const Inventory& inventory)
+    +get_robot() const : const Robot&
+    +get_abilities() const : const vector<shared_ptr<Robot_abilities>>&
+    +get_inventory() const : const Inventory&
+    +prepare_for_next_level(bool keep_statuses) : void
+  }
+  class Random_level_generator {
+    -find_free_cell(const Occupancy& used, int size, int from_x, int from_y, int min_distance, int& out_x, int& out_y) const : bool
+    -mark(Occupancy& used, int x, int y, int size) const : void
+    -add_walls(Map_editor& editor, Occupancy& used, int count) const : void
+    -add_slow_areas(Map_editor& editor, int count) const : void
+    +get_name() const : string
+    +create(int level_number, const Difficulty& difficulty) const : Game_session
+  }
+  class Rank_rewards {
+    -catalog_ : Ability_catalog
+    -rewarded_rank_ : int
+    -has_choice(const Robot_roster& robots, const Difficulty& difficulty) const : bool
+    +Rank_rewards()
+    +get_rewarded_rank() const : int
+    +set_rewarded_rank(int rank) : void
+    +is_available(const Robot_roster& robots, const Difficulty& difficulty) const : bool
+    +learn(Robot_roster& robots, shared_ptr<Robot_abilities> ability, const Difficulty& difficulty, Event_reporter& reporter) : bool
+    +upgrade(Robot_roster& robots, int ability_index, const Difficulty& difficulty, Event_reporter& reporter) : bool
+  }
+  class Robot_roster {
+    +{static} kPlayerIndex : int
+    -units_ : vector<Robot_unit>
+    -unit(int index) : Robot_unit&
+    -unit(int index) const : const Robot_unit&
+    +add(const Robot& robot, int x, int y, const vector<shared_ptr<Robot_abilities>>& abilities) : void
+    +get_count() const : int
+    +is_empty() const : bool
+    +is_player(int index) const : bool
+    +get_name(int index) const : string
+    +get_robot(int index) : Robot&
+    +get_robot(int index) const : const Robot&
+    +get_x(int index) const : int
+    +get_y(int index) const : int
+    +move_to(int index, int x, int y) : void
+    +find_at(int x, int y) const : int
+    +is_in_radius(int index, int x, int y, int radius) const : bool
+    +has_living_enemies() const : bool
+    +get_ability_count(int index) const : int
+    +get_ability(int robot_index, int ability_index) const : const Robot_abilities&
+    +get_ability(int robot_index, int ability_index) : Robot_abilities&
+    +share_ability(int robot_index, int ability_index) const : shared_ptr<Robot_abilities>
+    +find_ability(int robot_index, const string& name) const : int
+    +get_abilities(int index) const : const vector<shared_ptr<Robot_abilities>>&
+    +set_abilities(int index, const vector<shared_ptr<Robot_abilities>>& abilities) : void
+    +add_ability(int index, shared_ptr<Robot_abilities> ability) : void
+  }
+  class Robot_unit {
+    -robot_ : Robot
+    -x_ : int
+    -y_ : int
+    -abilities_ : vector<shared_ptr<Robot_abilities>>
+    +Robot_unit(const Robot& robot, int x, int y, const vector<shared_ptr<Robot_abilities>>& abilities)
+    +get_robot() : Robot&
+    +get_robot() const : const Robot&
+    +get_x() const : int
+    +get_y() const : int
+    +move_to(int x, int y) : void
+    +occupies(int x, int y) const : bool
+    +get_abilities() const : const vector<shared_ptr<Robot_abilities>>&
+    +set_abilities(const vector<shared_ptr<Robot_abilities>>& abilities) : void
+    +add_ability(shared_ptr<Robot_abilities> ability) : void
+  }
+  class Save_slot {
+    -path_ : string
+    -serializer_ : Game_serializer
+    -modes_ : Game_mode_catalog
+    +Save_slot(const string& path)
+    +get_path() const : const string&
+    +exists() const : bool
+    +save(const Game& game) const : void
+    +load(Game_event_listener* listener) const : unique_ptr<Game>
+  }
+  enum Screen {
+    Menu
+    Difficulty_select
+    Message
+    Game
+  }
+  class Unit_presets {
+    -power_percent_ : int
+    -scale(size_t value) const : size_t
+    +Unit_presets(int power_percent)
+    +create_enemy(int rank) const : Robot
+    +create_ally() const : Robot
+    +create_factory(int level) const : Robot_factory
+  }
+}
+
+package "gui — отрисовка (SDL3)" as pkg_gui #E4F5E1 {
+  class Assets {
+    -renderer_ : SDL_Renderer*
+    -root_ : string
+    -textures_ : map<string, SDL_Texture*>
+    +Assets(SDL_Renderer* renderer, const string& root)
+    +Assets()
+    +get(const string& path) : SDL_Texture*
+    +get_frame_count(SDL_Texture* texture) const : int
+  }
+  class Board_view {
+    -canvas_ : Canvas&
+    -layout_ : const Layout&
+    -sprites_ : const Sprite_catalog&
+    -last_robot_x_ : vector<int>
+    -robot_facing_left_ : vector<bool>
+    -draw_terrain(const Game_session& session) : void
+    -draw_cell_statuses(const Game_session& session) : void
+    -draw_factories(const Game_session& session) : void
+    -draw_ability_area(const Game_session& session, const Player_controller& controller) : void
+    -draw_robots(const Game_session& session) : void
+    -draw_robot_labels(const Game_session& session, const vector<int>& order) : void
+    -draw_highlight(const Game_session& session, const Display_mode_selector& display_mode) : void
+    -find_visible_robots(const Game_session& session) : vector<int>
+    -find_highlighted_cells(const Game_session& session, Display_mode mode, vector<pair<int, int>>& cells, vector<SDL_Color>& colors) const : void
+    +Board_view(Canvas& canvas, const Layout& layout, const Sprite_catalog& sprites)
+    +draw(const Game_session& session, const Player_controller& controller, const Display_mode_selector& display_mode) : void
+  }
+  class Canvas {
+    -renderer_ : SDL_Renderer*
+    -title_font_ : TTF_Font*
+    -text_font_ : TTF_Font*
+    -assets_ : Assets
+    -draw_text_with_font(TTF_Font* font, const string& text, float x, float y, SDL_Color color) : void
+    +Canvas(SDL_Renderer* renderer, const string& font_path, const string& assets_root)
+    +Canvas()
+    +clear(SDL_Color color) : void
+    +present() : void
+    +fill_rect(const SDL_FRect& rect, SDL_Color color) : void
+    +draw_rect(const SDL_FRect& rect, SDL_Color color, int thickness) : void
+    +draw_text(const string& text, float x, float y, SDL_Color color) : void
+    +draw_title(const string& text, float x, float y, SDL_Color color) : void
+    +draw_frame(const string& path, int frame, const SDL_FRect& destination, bool flip) : void
+    +draw_animated(const string& path, int offset, const SDL_FRect& destination, bool flip) : void
+    +get_animation_step(int frame_ms) const : int
+  }
+  class Dialog_view {
+    -canvas_ : Canvas&
+    -layout_ : const Layout&
+    -sprites_ : const Sprite_catalog&
+    -labels_ : const Key_labels&
+    -modes_ : Game_mode_catalog
+    +Dialog_view(Canvas& canvas, const Layout& layout, const Sprite_catalog& sprites, const Key_labels& labels)
+    +draw_menu(bool has_save) : void
+    +draw_difficulty_menu(int mode) : void
+    +draw_message(const string& title, const string& text) : void
+    +draw_start_screen(const Ability_catalog& catalog, const Difficulty& difficulty) : void
+    +draw_rank_reward(const Game_session& session, const Ability_catalog& catalog) : void
+    +draw_game_over(const Game_session& session, int level) : void
+    +draw_level_complete(const Game_session& session, int level) : void
+  }
+  class Game_view<Renderer> {
+    -renderer_ : Renderer&
+    -application_ : const Application&
+    +Game_view(Renderer& renderer, const Application& application)
+    +draw() : void
+  }
+  class Hud_view {
+    -canvas_ : Canvas&
+    -layout_ : const Layout&
+    -sprites_ : const Sprite_catalog&
+    -labels_ : const Key_labels&
+    -draw_player_stats(const Game_session& session, const Display_mode_selector& display_mode) : void
+    -draw_inventory(const Game_session& session) : void
+    -draw_log(const Game_session& session) : void
+    -draw_notification(const string& notification) : void
+    -draw_ability_slot(const Game_session& session, const Player_controller& controller, int slot) : void
+    -draw_hints(const Game_session& session, const Player_controller& controller) : void
+    -draw_legend(float x, float y) : void
+    +Hud_view(Canvas& canvas, const Layout& layout, const Sprite_catalog& sprites, const Key_labels& labels)
+    +draw(const Game_session& session, const Player_controller& controller, const Display_mode_selector& display_mode, const string& notification) : void
+  }
+  class Layout {
+    -board_columns_ : int
+    -board_rows_ : int
+    +Layout(int board_columns, int board_rows)
+    +get_cell_size() const : float
+    +get_board_width() const : float
+    +get_board_height() const : float
+    +get_window_width() const : int
+    +get_window_height() const : int
+    +get_cell_rect(int x, int y) const : SDL_FRect
+    +get_side_panel() const : SDL_FRect
+    +get_ability_bar() const : SDL_FRect
+    +get_ability_slot(int slot) const : SDL_FRect
+    +get_inventory_slot(int slot) const : SDL_FRect
+    +get_text_x() const : float
+    +get_hint_x() const : float
+  }
+  class Palette {
+    +{static} kWhite : SDL_Color
+    +{static} kGray : SDL_Color
+    +{static} kYellow : SDL_Color
+    +{static} kBackground : SDL_Color
+  }
+  class Sdl_renderer {
+    -layout_ : Layout
+    -sprites_ : Sprite_catalog
+    -labels_ : Key_labels
+    -window_ : SDL_Window*
+    -renderer_ : SDL_Renderer*
+    -canvas_ : Canvas*
+    -board_view_ : Board_view*
+    -hud_view_ : Hud_view*
+    -dialog_view_ : Dialog_view*
+    -fit_window(const Game_session& session) : void
+    +Sdl_renderer(const Key_labels& labels)
+    +Sdl_renderer()
+    +draw_menu(bool has_save) : void
+    +draw_difficulty_menu(int mode) : void
+    +draw_message(const string& title, const string& text) : void
+    +draw_game(const Game& game, const string& notification) : void
+  }
+  class Sprite_catalog {
+    -get_status_icon(const string& status_name) const : string
+    -get_item_icon(const string& item_name) const : string
+    -get_item_icon_source(const string& item_name) const : SDL_FRect
+    +get_unit_sprite(const Game_session& session, int index) const : string
+    +get_rock_sprite(int x, int y) const : string
+    +get_grass_tileset() const : string
+    +get_grass_source() const : SDL_FRect
+    +get_factory_sprite() const : string
+    +get_ability_icon(const string& ability_name) const : string
+    +get_status_color(const string& status_name) const : SDL_Color
+    +draw_status_icon(Canvas& canvas, const string& status_name, int offset, const SDL_FRect& destination) const : void
+    +draw_item_icon(Canvas& canvas, const string& item_name, const SDL_FRect& destination) const : void
+  }
+}
+
+package "input — ввод (SDL3)" as pkg_input #F9E1EC {
+  class Game_controller<Input> {
+    -input_ : Input&
+    -application_ : Application&
+    +Game_controller(Input& input, Application& application)
+    +process_input() : void
+  }
+  class Key_bindings {
+    -commands_ : map<string, Command>
+    -keys_ : Key_labels
+    -bind(Command command, const string& key) : void
+    -parse_line(const string& line, int line_number) : void
+    -to_upper(string text) const : string
+    -trim(const string& text) const : string
+    -cut_modifier(string& combo, int& modifier) const : bool
+    -normalize(const string& combo) const : string
+    +Key_bindings()
+    +Key_bindings(const string& path)
+    +get_command_name(Command command) const : string
+    +get_key_name(const string& combo) const : string
+    +find_command(const string& key, Command& command) const : bool
+    +get_labels() const : const Key_labels&
+  }
+  class Sdl_input {
+    -bindings_ : Key_bindings
+    -warning_ : string
+    -get_combo(const SDL_KeyboardEvent& key) const : string
+    +Sdl_input(const string& config_path)
+    +Sdl_input()
+    +read_command(Command& command) : bool
+    +get_labels() const : const Key_labels&
+    +get_warning() const : const string&
+  }
+}
+
+package "save — сохранение" as pkg_save #EDE4FA {
+  class Board_serializer {
+    -statuses_ : Status_serializer
+    +write(Save_writer& out, const Game_board& board) const : void
+    +read(Save_reader& in) const : Game_board
+  }
+  class Game_serializer {
+    -session_ : Session_serializer
+    -checksum(const string& text) const : uint64_t
+    -write_body(const Game& game) const : string
+    -read_body(const string& body) const : Loaded_game
+    +save(const Game& game, const string& path) const : void
+    +load(const string& path) const : Loaded_game
+    +exists(const string& path) const : bool
+  }
+  class Loaded_game {
+    -mode_ : string
+    -level_ : int
+    -session_ : unique_ptr<Game_session>
+    -selected_slot_ : int
+    -ability_switched_ : bool
+    +Loaded_game(const string& mode, int level, unique_ptr<Game_session> session, int selected_slot, bool ability_switched)
+    +get_mode() const : const string&
+    +get_level() const : int
+    +get_selected_slot() const : int
+    +is_ability_switched() const : bool
+    +release_session() : unique_ptr<Game_session>
+  }
+  class Robot_serializer {
+    -statuses_ : Status_serializer
+    +write(Save_writer& out, const Robot& robot) const : void
+    +read(Save_reader& in) const : Robot
+  }
+  class Save_reader {
+    -in_ : istringstream
+    +Save_reader(const string& text)
+    +expect(const string& key) : void
+    +read_int(long long min, long long max, const string& what) : long long
+    +read_bool(const string& what) : bool
+    +read_string(const string& what) : string
+    +expect_end() : void
+  }
+  class Save_writer {
+    -out_ : ostringstream
+    -line_start_ : bool
+    -separate() : void
+    +Save_writer()
+    +write_key(const string& key) : void
+    +write_int(long long value) : void
+    +write_bool(bool value) : void
+    +write_string(const string& text) : void
+    +end_line() : void
+    +get_text() const : string
+  }
+  class Session_serializer {
+    -board_ : Board_serializer
+    -robot_ : Robot_serializer
+    -abilities_ : Ability_catalog
+    -items_ : Item_catalog
+    -write_difficulty(Save_writer& out, const Difficulty& difficulty) const : void
+    -write_robots(Save_writer& out, const Game_session& session) const : void
+    -write_factories(Save_writer& out, const Game_session& session) const : void
+    -write_inventory(Save_writer& out, const Inventory& inventory) const : void
+    -write_log(Save_writer& out, const Event_log& log) const : void
+    -read_difficulty(Save_reader& in) const : Difficulty
+    -read_abilities(Save_reader& in) const : vector<shared_ptr<Robot_abilities>>
+    -read_factory(Save_reader& in) const : Robot_factory
+    -read_inventory(Save_reader& in) const : Inventory
+    +write(Save_writer& out, const Game_session& session) const : void
+    +read(Save_reader& in) const : unique_ptr<Game_session>
+  }
+  class Status_serializer {
+    -items_ : Item_catalog
+    +write(Save_writer& out, const Robot_status& status) const : void
+    +read(Save_reader& in, bool on_robot) const : shared_ptr<Robot_status>
+  }
+}
+
+package "logging — журнал" as pkg_logging #FFF4CC {
+  class File_logger<Output> {
+    -settings_ : Log_settings
+    -output_ : Output
+    -formatter_ : Log_line_formatter
+    +File_logger(const Log_settings& settings, const string& directory)
+    +log(Log_level level, const string& message) : void
+  }
+  class Game_log_listener {
+    -logger_ : Logger&
+    +Game_log_listener(Logger& logger)
+    +on_game_event(Game_event_type type, const string& text) : void
+  }
+  class Lazy_log_file {
+    -path_ : string
+    -file_ : ofstream
+    +Lazy_log_file(const string& path)
+    +write(const string& line) : void
+  }
+  enum Log_level {
+    Program_info
+    Game_info
+    Program_error
+    Game_error
+  }
+  class Log_line_formatter {
+    -get_tag(Log_level level) const : string
+    -get_time() const : string
+    +format(Log_level level, const string& message) const : string
+  }
+  class Log_settings {
+    -enabled_ : bool[kLogLevelCount]
+    +Log_settings()
+    +Log_settings(const string& levels)
+    +is_enabled(Log_level level) const : bool
+    +to_string() const : string
+  }
+  abstract class Logger {
+    +Logger()
+    +{abstract} log(Log_level level, const string& message) : void
+  }
+  class Single_file_output {
+    -file_ : Lazy_log_file
+    +Single_file_output(const string& directory)
+    +write(Log_level level, const string& line) : void
+  }
+  class Split_file_output {
+    -info_ : Lazy_log_file
+    -errors_ : Lazy_log_file
+    +Split_file_output(const string& directory)
+    +write(Log_level level, const string& line) : void
+  }
+}
+
+package "robot — роботы" as pkg_robot #FBE3D6 {
+  enum Relation {
+    Enemy
+    Neutral
+    Ally
+  }
+  class Robot {
+    +{static} kMaxStat : size_t
+    -current_health_ : size_t
+    -max_health_ : size_t
+    -attack_power_ : size_t
+    -current_energy_ : size_t
+    -max_energy_ : size_t
+    -current_experience_ : size_t
+    -experience_to_next_rank_ : size_t
+    -rank_ : size_t
+    -vision_radius_ : size_t
+    -heal_power_ : size_t
+    -speed_ : size_t
+    -movement_points_ : size_t
+    -relation_ : Relation
+    -statuses_ : Status_list
+    -clamp_add(size_t value, int delta, size_t lower, size_t upper) const : size_t
+    -rank_up_if_ready() : void
+    +Robot(size_t current_health, size_t max_health, size_t attack_power, size_t current_energy, size_t max_energy, size_t current_experience, size_t experience_to_next_rank, size_t rank, size_t vision_radius, size_t heal_power, size_t speed, Relation relation)
+    +change_health(int delta) : void
+    +change_energy(int delta) : void
+    +change_experience(int delta) : void
+    +change_attack_power(int delta) : void
+    +change_vision_radius(int delta) : void
+    +change_rank(int delta) : void
+    +change_experience_to_next_rank(int delta) : void
+    +change_max_health(int delta) : void
+    +change_max_energy(int delta) : void
+    +change_heal_power(int delta) : void
+    +change_speed(int delta) : void
+    +reset_energy() : void
+    +spend_movement_points(int cost) : bool
+    +restore_movement_points() : void
+    +can_move() const : bool
+    +is_enemy_of(const Robot& other) const : bool
+    +can_interact_with(const Robot& other) const : bool
+    +interaction_with_robot(Robot* robot) : void
+    +deal_damage(Robot* robot, int damage) : void
+    +take_damage(int damage) : void
+    +add_status(shared_ptr<Robot_status> status) : void
+    +clear_statuses() : void
+    +try_activate_ability() : bool
+    +process_statuses_turn_end() : void
+    +get_status_count() const : int
+    +get_status(int index) const : const Robot_status&
+    +get_current_health() const : size_t
+    +get_max_health() const : size_t
+    +get_attack_power() const : size_t
+    +get_attack_bonus() const : size_t
+    +get_current_energy() const : size_t
+    +get_max_energy() const : size_t
+    +get_current_experience() const : size_t
+    +get_experience_to_next_rank() const : size_t
+    +get_rank() const : size_t
+    +get_vision_radius() const : size_t
+    +get_heal_power() const : size_t
+    +get_speed() const : size_t
+    +get_movement_points() const : size_t
+    +get_relation() const : Relation
+    +is_alive() const : bool
+  }
+  class Robot_factory {
+    -unit_ : Robot
+    -factory_output_ : size_t
+    -level_ : size_t
+    -spawn_period_ : size_t
+    -turns_until_spawn_ : size_t
+    -current_health_ : size_t
+    -max_health_ : size_t
+    +{static} kDefaultHealth : size_t
+    +Robot_factory(const Robot& unit, size_t factory_output, size_t level, size_t spawn_period, size_t max_health)
+    +set_level(size_t level) : void
+    +set_unit(const Robot& unit) : void
+    +set_factory_output(size_t factory_output) : void
+    +set_spawn_period(size_t spawn_period) : void
+    +set_turns_until_spawn(size_t turns) : void
+    +get_level() const : size_t
+    +get_unit() const : Robot
+    +get_factory_output() const : size_t
+    +get_spawn_period() const : size_t
+    +get_turns_until_spawn() const : size_t
+    +get_size() const : int
+    +get_current_health() const : size_t
+    +get_max_health() const : size_t
+    +take_damage(int damage) : void
+    +is_destroyed() const : bool
+    +create() const : Robot
+    +produce() : vector<Robot>
+  }
+}
+
+package "board — игровое поле" as pkg_board #E0F2F1 {
+  class Board_square {
+    -speed_level_ : int
+    -border_ : bool
+    -visible_ : bool
+    -discovered_ : bool
+    -statuses_ : vector<shared_ptr<Robot_status>>
+    +Board_square()
+    +get_speed_level() const : int
+    +set_speed_level(int level) : void
+    +is_border() const : bool
+    +set_border(bool border) : void
+    +is_visible() const : bool
+    +set_visible(bool visible) : void
+    +is_discovered() const : bool
+    +set_discovered(bool discovered) : void
+    +get_statuses() const : const vector<shared_ptr<Robot_status>>&
+    +add_status(shared_ptr<Robot_status> status) : void
+    +remove_status(size_t index) : void
+    +clear_statuses() : void
+  }
+  class Cell_status_generator {
+    -one_status_chance_ : int
+    -two_status_chance_ : int
+    -items_ : Item_catalog
+    -create_random_status() const : shared_ptr<Robot_status>
+    +Cell_status_generator(int one_status_chance , int two_status_chance)
+    +generate(Game_board& board) const : void
+    +create_status(Cell_status_type type) const : shared_ptr<Robot_status>
+  }
+  enum Cell_status_type {
+    Slow
+    Overload
+    Burn
+    Shield
+    Item
+  }
+  enum Direction {
+    UP
+    DOWN
+    LEFT
+    RIGHT
+  }
+  class Direction_offset {
+    -dx_ : int
+    -dy_ : int
+    +Direction_offset(Direction direction)
+    +get_dx() const : int
+    +get_dy() const : int
+  }
+  class Game_board {
+    +{static} kMinSize : size_t
+    +{static} kMaxSize : size_t
+    -width_ : size_t
+    -height_ : size_t
+    -squares_ : vector<vector<Board_square>>
+    -no_statuses_ : vector<shared_ptr<Robot_status>>
+    +Game_board(size_t width, size_t height)
+    +get_board_size() const : pair<size_t, size_t>
+    +is_inside(int x, int y) const : bool
+    +get_all_coordinates() const : vector<pair<int, int>>
+    +set_square_speed_level(int x, int y, int level) : void
+    +get_square_speed_level(int x, int y) const : int
+    +set_square_border(int x, int y, bool border) : void
+    +get_square_border(int x, int y) const : bool
+    +set_square_visible(int x, int y, bool visible) : void
+    +get_square_visible(int x, int y) const : bool
+    +set_square_discovered(int x, int y, bool discovered) : void
+    +get_square_discovered(int x, int y) const : bool
+    +add_square_status(int x, int y, shared_ptr<Robot_status> status) : void
+    +get_square_statuses(int x, int y) const : const vector<shared_ptr<Robot_status>>&
+    +remove_random_square_status(int x, int y) : void
+    +clear_square_statuses(int x, int y) : void
+  }
+}
+
+package "abilities — способности" as pkg_abilities #F3E5F5 {
+  class Ability_catalog {
+    +{static} kMaxLevel : int
+    -names_ : vector<string>
+    +Ability_catalog()
+    +get_count() const : int
+    +get_name(int index) const : const string&
+    +create(int index) const : shared_ptr<Robot_abilities>
+    +create(const string& name, int level) const : shared_ptr<Robot_abilities>
+    +create_enemy_ability() const : shared_ptr<Robot_abilities>
+  }
+  class Around_attack {
+    -radius_ : int
+    -level_ : int
+    -find_targets(const Game_session& session, int user_index) const : vector<int>
+    +Around_attack()
+    +get_name() const : string
+    +get_energy_cost() const : size_t
+    +get_radius() const : int
+    +needs_target() const : bool
+    +can_use(const Game_session&session, int user_index, int target_x, int target_y) const : bool
+    +use(Game_session&session, int user_index, int target_x, int target_y) const : void
+    +get_level() const : int
+    +get_upgrade_description() const : string
+    +upgrade() : void
+  }
+  class Heal {
+    -heal_amount_ : int
+    -level_ : int
+    +Heal()
+    +get_name() const : string
+    +get_energy_cost() const : size_t
+    +get_radius() const : int
+    +needs_target() const : bool
+    +can_use(const Game_session&session, int user_index, int target_x, int target_y) const : bool
+    +use(Game_session&session, int user_index, int target_x, int target_y) const : void
+    +get_level() const : int
+    +get_upgrade_description() const : string
+    +upgrade() : void
+  }
+  class Long_attack {
+    -bonus_damage_ : int
+    -level_ : int
+    +Long_attack()
+    +get_name() const : string
+    +get_energy_cost() const : size_t
+    +get_radius() const : int
+    +needs_target() const : bool
+    +can_use(const Game_session&session, int user_index, int target_x, int target_y) const : bool
+    +use(Game_session&session, int user_index, int target_x, int target_y) const : void
+    +get_level() const : int
+    +get_upgrade_description() const : string
+    +upgrade() : void
+  }
+  abstract class Robot_abilities {
+    +Robot_abilities()
+    +{abstract} get_name() const : string
+    +{abstract} get_energy_cost() const : size_t
+    +{abstract} get_radius() const : int
+    +{abstract} needs_target() const : bool
+    +{abstract} can_use(const Game_session& session, int user_index, int target_x, int target_y) const : bool
+    +{abstract} use(Game_session& session, int user_index, int target_x, int target_y) const : void
+    +{abstract} get_level() const : int
+    +{abstract} get_upgrade_description() const : string
+    +{abstract} upgrade() : void
+  }
+  class Teleport {
+    -energy_cost_ : int
+    -level_ : int
+    +Teleport()
+    +get_name() const : string
+    +get_energy_cost() const : size_t
+    +get_radius() const : int
+    +needs_target() const : bool
+    +can_use(const Game_session&session, int user_index, int target_x, int target_y) const : bool
+    +use(Game_session&session, int user_index, int target_x, int target_y) const : void
+    +get_level() const : int
+    +get_upgrade_description() const : string
+    +upgrade() : void
+  }
+}
+
+package "statuses — статусы" as pkg_statuses #FFEBEE {
+  class Base_status {
+    +get_amount() const : int
+    +merge(const Robot_status& other) : bool
+    +blocks_movement() const : bool
+    +blocks_ability() const : bool
+    +on_ability_attempt() : void
+    +absorb_damage(int damage) : int
+    +on_turn_end() : int
+    +on_apply(Game_session& session, int robot_index) : void
+    +get_attack_bonus() const : int
+  }
+  class Burn {
+    -turns_ : int
+    -damage_ : int
+    +{static} kDefaultTurns : int
+    +{static} kDefaultDamage : int
+    +Burn(int turns , int damage)
+    +get_name() const : string
+    +get_description() const : string
+    +get_amount() const : int
+    +get_damage() const : int
+    +clone() const : shared_ptr<Robot_status>
+    +merge(const Robot_status& other) : bool
+    +on_turn_end() : int
+    +is_expired() const : bool
+  }
+  class Item_pickup {
+    -item_ : shared_ptr<Item>
+    -expired_ : bool
+    +Item_pickup(shared_ptr<Item> item)
+    +get_name() const : string
+    +get_description() const : string
+    +clone() const : shared_ptr<Robot_status>
+    +on_apply(Game_session& session, int robot_index) : void
+    +is_expired() const : bool
+  }
+  class Overload {
+    -expired_ : bool
+    +Overload()
+    +get_name() const : string
+    +get_description() const : string
+    +get_amount() const : int
+    +clone() const : shared_ptr<Robot_status>
+    +merge(const Robot_status& other) : bool
+    +blocks_ability() const : bool
+    +on_ability_attempt() : void
+    +is_expired() const : bool
+  }
+  abstract class Robot_status {
+    +Robot_status()
+    +{abstract} get_name() const : string
+    +{abstract} get_description() const : string
+    +{abstract} get_amount() const : int
+    +{abstract} clone() const : shared_ptr<Robot_status>
+    +{abstract} merge(const Robot_status& other) : bool
+    +{abstract} blocks_movement() const : bool
+    +{abstract} blocks_ability() const : bool
+    +{abstract} on_ability_attempt() : void
+    +{abstract} absorb_damage(int damage) : int
+    +{abstract} on_turn_end() : int
+    +{abstract} on_apply(Game_session& session, int robot_index) : void
+    +{abstract} get_attack_bonus() const : int
+    +{abstract} is_expired() const : bool
+  }
+  class Shield {
+    -amount_ : int
+    -expired_ : bool
+    +Shield(int amount)
+    +get_name() const : string
+    +get_description() const : string
+    +get_amount() const : int
+    +clone() const : shared_ptr<Robot_status>
+    +merge(const Robot_status& other) : bool
+    +absorb_damage(int damage) : int
+    +is_expired() const : bool
+  }
+  class Slow {
+    -turns_ : int
+    +Slow(int turns)
+    +get_name() const : string
+    +get_description() const : string
+    +get_amount() const : int
+    +clone() const : shared_ptr<Robot_status>
+    +merge(const Robot_status& other) : bool
+    +blocks_movement() const : bool
+    +on_turn_end() : int
+    +is_expired() const : bool
+  }
+  class Status_list {
+    -statuses_ : vector<shared_ptr<Robot_status>>
+    -copy_from(const Status_list& other) : void
+    -remove_expired() : void
+    +Status_list()
+    +Status_list(const Status_list& other)
+    +operator=(const Status_list& other) : Status_list&
+    +add(shared_ptr<Robot_status> status) : void
+    +clear_statuses() : void
+    +blocks_movement() const : bool
+    +try_activate_ability() : bool
+    +absorb_damage(int damage) : int
+    +process_turn_end() : int
+    +get_attack_bonus() const : int
+    +get_count() const : int
+    +get(int index) const : const Robot_status&
+  }
+  class Strength {
+    -turns_ : int
+    -bonus_ : int
+    +Strength(int turns, int bonus)
+    +get_name() const : string
+    +get_description() const : string
+    +get_amount() const : int
+    +clone() const : shared_ptr<Robot_status>
+    +merge(const Robot_status& other) : bool
+    +on_turn_end() : int
+    +get_attack_bonus() const : int
+    +is_expired() const : bool
+  }
+}
+
+package "items — предметы" as pkg_items #E8EAF6 {
+  class Attack_potion {
+    +get_name() const : string
+    +get_description() const : string
+    +can_use(const Game_session& session, int user_index) const : bool
+    +use(Game_session& session, int user_index) const : void
+  }
+  class Energy_potion {
+    +get_name() const : string
+    +get_description() const : string
+    +can_use(const Game_session& session, int user_index) const : bool
+    +use(Game_session& session, int user_index) const : void
+  }
+  class Health_potion {
+    +get_name() const : string
+    +get_description() const : string
+    +can_use(const Game_session& session, int user_index) const : bool
+    +use(Game_session& session, int user_index) const : void
+  }
+  class Inventory {
+    -capacity_ : size_t
+    -items_ : vector<shared_ptr<Item>>
+    +Inventory(size_t capacity)
+    +add_item(shared_ptr<Item> item) : bool
+    +take_item(int slot) : shared_ptr<Item>
+    +get_item(int slot) const : const Item&
+    +get_size() const : int
+    +get_capacity() const : int
+    +is_full() const : bool
+  }
+  abstract class Item {
+    +Item()
+    +{abstract} get_name() const : string
+    +{abstract} get_description() const : string
+    +{abstract} can_use(const Game_session& session, int user_index) const : bool
+    +{abstract} use(Game_session& session, int user_index) const : void
+  }
+  class Item_catalog {
+    +get_count() const : int
+    +create(int index) const : shared_ptr<Item>
+    +create(const string& name) const : shared_ptr<Item>
+    +create_random() const : shared_ptr<Item>
+  }
+}
+
+Application *-- Command_slots
+Application *-- Game
+Application *-- Game_log_listener
+Application *-- Game_mode_catalog
+Application *-- Save_slot
+Application --> Screen
+Application o-- Logger
+Around_attack ..|> Robot_abilities
+Attack_potion ..|> Item
+Base_status ..|> Robot_status
+Board_serializer *-- Status_serializer
+Board_square o-- "*" Robot_status
+Board_view o-- Canvas
+Board_view o-- Layout
+Board_view o-- Sprite_catalog
+Burn --|> Base_status
+Canvas *-- Assets
+Cell_status_generator *-- Item_catalog
+Command_line_options *-- Log_settings
+Dialog_view *-- Game_mode_catalog
+Dialog_view o-- Canvas
+Dialog_view o-- Key_labels
+Dialog_view o-- Layout
+Dialog_view o-- Sprite_catalog
+Difficulty --> Difficulty_level
+Difficulty --> Modifier
+Display_mode_selector --> Display_mode
+Energy_potion ..|> Item
+Event_reporter *-- Event_log
+Event_reporter o-- Game_event_listener
+Factory_roster *-- "*" Placed_factory
+File_logger *-- Log_line_formatter
+File_logger *-- Log_settings
+File_logger ..> Single_file_output : Output
+File_logger ..> Split_file_output : Output
+File_logger ..|> Logger
+Game_board *-- "*" Board_square
+Game_board o-- "*" Robot_status
+Game_controller ..> Application : handle()
+Game_controller ..> Sdl_input : Input
+Game_controller o-- Application
+Game_log_listener ..|> Game_event_listener
+Game_log_listener o-- Logger
+Game_mode_catalog ..> Game_template : создаёт
+Game_serializer *-- Session_serializer
+Game_session *-- Ability_catalog
+Game_session *-- Difficulty
+Game_session *-- Enemy_controller
+Game_session *-- Event_reporter
+Game_session *-- Factory_roster
+Game_session *-- Game_board
+Game_session *-- Inventory
+Game_session *-- Rank_rewards
+Game_session *-- Robot_roster
+Game_template *-- Command_slots
+Game_template *-- Difficulty
+Game_template *-- Display_mode_selector
+Game_template *-- Game_session
+Game_template *-- Player_controller
+Game_template --> Game_phase
+Game_template ..> File_level_generator : Level_generator
+Game_template ..> Random_level_generator : Level_generator
+Game_template ..|> Game
+Game_template o-- Game_event_listener
+Game_view ..> Application : читает
+Game_view ..> Sdl_renderer : Renderer
+Game_view o-- Application
+Heal ..|> Robot_abilities
+Health_potion ..|> Item
+Hud_view o-- Canvas
+Hud_view o-- Key_labels
+Hud_view o-- Layout
+Hud_view o-- Sprite_catalog
+Inventory o-- "*" Item
+Item_pickup --|> Base_status
+Item_pickup o-- Item
+Key_bindings *-- Key_labels
+Key_bindings --> Command
+Key_labels *-- Command_slots
+Key_labels --> Command
+Loaded_game *-- Game_session
+Long_attack ..|> Robot_abilities
+Map_editor *-- "*" Placed_factory
+Map_editor *-- "*" Robot_unit
+Map_editor *-- Cell_status_generator
+Map_editor *-- Game_board
+Overload --|> Base_status
+Placed_factory *-- Robot_factory
+Player_controller *-- Ability_catalog
+Player_controller o-- Game_session
+Player_state *-- Inventory
+Player_state *-- Robot
+Player_state o-- "*" Robot_abilities
+Program *-- Command_line_options
+Program ..> Application : создаёт
+Program ..> Game_controller : создаёт
+Program ..> Game_view : создаёт
+Rank_rewards *-- Ability_catalog
+Robot *-- Status_list
+Robot --> Relation
+Robot_factory *-- Robot
+Robot_roster *-- "*" Robot_unit
+Robot_serializer *-- Status_serializer
+Robot_unit *-- Robot
+Robot_unit o-- "*" Robot_abilities
+Save_slot *-- Game_mode_catalog
+Save_slot *-- Game_serializer
+Save_slot ..> Game_serializer
+Sdl_input *-- Key_bindings
+Sdl_renderer *-- Key_labels
+Sdl_renderer *-- Layout
+Sdl_renderer *-- Sprite_catalog
+Sdl_renderer o-- Board_view
+Sdl_renderer o-- Canvas
+Sdl_renderer o-- Dialog_view
+Sdl_renderer o-- Hud_view
+Session_serializer *-- Ability_catalog
+Session_serializer *-- Board_serializer
+Session_serializer *-- Item_catalog
+Session_serializer *-- Robot_serializer
+Shield --|> Base_status
+Single_file_output *-- Lazy_log_file
+Slow --|> Base_status
+Split_file_output *-- Lazy_log_file
+Status_list o-- "*" Robot_status
+Status_serializer *-- Item_catalog
+Strength --|> Base_status
+Teleport ..|> Robot_abilities
+@enduml
