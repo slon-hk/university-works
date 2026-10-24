@@ -1,14 +1,147 @@
-# University Works
+<div align="center">
 
-## 🇷🇺 Описание (Русский)
+# 🎓 University Works
 
-Этот репозиторий содержит учебные работы, выполненные в рамках обучения в **СПБГЭТУ «ЛЭТИ»**.  
-Факультет **КТИ** (Компьютерных технологий и информатики).  
-Направление подготовки **ПМИ** (Прикладная математика и информатика).
+**Учебные работы — СПбГЭТУ «ЛЭТИ»**
+Факультет компьютерных технологий и информатики (КТИ) · Прикладная математика и информатика (ПМИ)
 
-Репозиторий предназначен для хранения и систематизации лабораторных, практических и курсовых работ по различным дисциплинам, изучаемым в ходе обучения.
+![C++](https://img.shields.io/badge/C%2B%2B-20-00599C?logo=cplusplus&logoColor=white)
+![C](https://img.shields.io/badge/C-A8B9CC?logo=c&logoColor=black)
+![Python](https://img.shields.io/badge/Python-3-3776AB?logo=python&logoColor=white)
+![Assembly](https://img.shields.io/badge/Assembly-x86-6E4C13)
+![CMake](https://img.shields.io/badge/CMake-064F8C?logo=cmake&logoColor=white)
+![GoogleTest](https://img.shields.io/badge/GoogleTest-4285F4?logo=google&logoColor=white)
+![SDL3](https://img.shields.io/badge/SDL-3-1E90FF)
 
-### 📁 Структура репозитория
+[Русский](#-о-репозитории) · [English](#-english)
+
+</div>
+
+---
+
+## 📖 О репозитории
+
+Лабораторные, практические и курсовые работы, выполненные во время учёбы. У каждой работы своя папка: исходный код в `src/`, рядом отчёт (`.docx` / `.pdf`), а где есть — условие задания (`Job_condition.md`).
+
+<table>
+  <tr>
+    <td align="center"><b>26</b><br><sub>работ</sub></td>
+    <td align="center"><b>6</b><br><sub>дисциплин</sub></td>
+    <td align="center"><b>≈ 17 тыс.</b><br><sub>строк C++</sub></td>
+    <td align="center"><b>≈ 2 тыс.</b><br><sub>строк C</sub></td>
+    <td align="center"><b>≈ 0,9 тыс.</b><br><sub>строк Python</sub></td>
+  </tr>
+</table>
+
+<sub>Строки посчитаны без сторонних библиотек (`vendor/`) и ассетов.</sub>
+
+---
+
+## ⭐ Главный проект — Robot Tactics
+
+<table>
+  <tr>
+    <td width="55%">
+      <a href="OOP"><img src="OOP/docs/screenshots/lab3_game_turns.png" alt="Robot Tactics"></a>
+    </td>
+    <td>
+      <b>Пошаговая тактическая игра с роботами</b> на C++20 и SDL3. Игра развивалась на протяжении трёх лабораторных по ООП.<br><br>
+      🗺️ фиксированные, случайные и бесконечные уровни<br>
+      ⚔️ способности, статусы, инвентарь, ИИ врагов<br>
+      💾 сохранение с контрольной суммой, журнал событий<br>
+      ⌨️ настраиваемое управление с сочетаниями клавиш<br>
+      🧬 83 класса и полная UML-диаграмма<br><br>
+      <a href="OOP"><b>→ Подробнее, скриншоты и UML</b></a>
+    </td>
+  </tr>
+</table>
+
+---
+
+## 📚 Дисциплины
+
+| | Дисциплина | Язык и инструменты | Работы |
+|:-:|---|---|:-:|
+| 🎮 | [**Объектно-ориентированное программирование**](#-объектно-ориентированное-программирование) | C++20, SDL3, CMake | 3 |
+| 🧮 | [**Алгоритмы и структуры данных**](#-алгоритмы-и-структуры-данных) | C++, CMake, GoogleTest | 2 |
+| 💻 | [**Программирование**](#-программирование) | C, Make | 8 + 2 курсовые |
+| 🐍 | [**Информатика**](#-информатика) | Python, NumPy, Pillow, scikit-learn | 6 |
+| 🔌 | [**Организация ЭВМ и систем**](#-организация-эвм-и-систем) | Ассемблер x86 | 1 |
+| 🔬 | [**Физика**](#-физика) | отчёты | 4 |
+
+---
+
+### 🎮 Объектно-ориентированное программирование
+
+<sub>C++20 · SDL3 · CMake → [подробный README с UML](OOP/README.md)</sub>
+
+Одна игра, которая усложняется от работы к работе.
+
+| Работа | Тема | Ключевые идеи |
+|---|---|---|
+| [lab 1](OOP/lab%201) | Робот, поле, пошаговый цикл, заводы роботов, туман войны, редактор карт | классы, инкапсуляция, отделение отрисовки от модели |
+| [lab 2](OOP/lab%202) | Способности, статусы, клетки со статусами, инвентарь, ИИ врагов, спрайты | интерфейсы, наследование, полиморфизм |
+| [lab 3](OOP/lab%203) | Шаблонная игра с тремя режимами, меню, сложность, сохранение, журнал, настраиваемое управление | шаблоны классов, независимые подсистемы ввода и отрисовки |
+
+### 🧮 Алгоритмы и структуры данных
+
+<sub>3 семестр · C++ · CMake · GoogleTest</sub>
+
+| Работа | Тема | Что внутри |
+|---|---|---|
+| [lab 1](Algorithms/lab%201) | Циклический дек (`CircularDeque`) | реализация, интерактивный режим, юнит-тесты, бенчмарк и график на Python |
+| [lab 2](Algorithms/lab%202) | Сортировка Timsort с режимом галопа | реализация, юнит-тесты, бенчмарк, результаты в `results.csv`, график |
+
+### 💻 Программирование
+
+<sub>1–2 семестр · C</sub>
+
+| Семестр | Работа | Тема |
+|:-:|---|---|
+| 1 | [Laboratory work 1](Programming/Semester%201/Laboratory%20work%201) | Обработка массива, подзадачи в функциях |
+| 1 | [Laboratory work 2](Programming/Semester%201/Laboratory%20work%202) | То же, но многофайловый проект с Makefile |
+| 1 | [Laboratory work 3](Programming/Semester%201/Laboratory%20work%203) | Форматирование текста |
+| 1 | [Laboratory work 4](Programming/Semester%201/Laboratory%20work%204) | Сортировки и сравнение времени работы |
+| 1 | 🏆 [**Coursework**](Programming/Semester%201/Coursework) | Курсовая: обработка текста (вариант 4.11) |
+| 2 | [Labatory work 1](Programming/Semester%202/Labatory%20work%201) | Регулярные выражения (`regex.h`) |
+| 2 | [Labatory work 2](Programming/Semester%202/Labatory%20work%202) | Сортировка `qsort` |
+| 2 | [Labatory work 3](Programming/Semester%202/Labatory%20work%203) | Рекурсивный обход директорий |
+| 2 | [Laboratory work 4](Programming/Semester%202/Laboratory%20work%204) | Проверка валидности HTML-тегов (стек, C++) |
+| 2 | 🏆 [**Coursework**](Programming/Semester%202/Coursework) | Курсовая: CLI-редактор PNG (вариант 4.20) |
+
+### 🐍 Информатика
+
+<sub>1–2 семестр · Python</sub>
+
+| Семестр | Работа | Тема |
+|:-:|---|---|
+| 1 | [Laboratory work 1](Computer%20Science/1%20Semester/Laboratory%20work%201) | NumPy: линейная алгебра |
+| 1 | [Laboratory work 2](Computer%20Science/1%20Semester/Laboratory%20work%202) | Pillow: рисование и обработка изображений |
+| 1 | [Laboratory work 3](Computer%20Science/1%20Semester/Laboratory%20work%203) | Обработка строк |
+| 2 | [Laboratory work 1](Computer%20Science/2%20Semester/Laboratory%20work%201) | ООП: классы и наследование |
+| 2 | [Laboratory work 2](Computer%20Science/2%20Semester/Laboratory%20work%202) | Связный список |
+| 2 | [Laboratory work 3](Computer%20Science/2%20Semester/Laboratory%20work%203) | Машинное обучение: scikit-learn, датасет Iris |
+
+### 🔌 Организация ЭВМ и систем
+
+<sub>Ассемблер x86</sub>
+
+| Работа | Тема |
+|---|---|
+| [lab 1](ORGEVM/lab%201) | Первые программы на ассемблере: `HELLO1.ASM`, `HELLO2.ASM` |
+
+### 🔬 Физика
+
+<sub>2 семестр · отчёты по лабораторным</sub>
+
+[lab 1](Physics/2%20sem/lab%201.docx) · [lab 4](Physics/2%20sem/lab%204.docx) · [lab 9](Physics/2%20sem/lab%209.docx) · [lab 12](Physics/2%20sem/lab%2012.docx)
+
+---
+
+## 🗂 Структура
+
+<details>
+<summary><b>Показать полное дерево файлов</b></summary>
 
 ```
 university-works/
@@ -58,43 +191,40 @@ university-works/
 │           ├── src/main.py
 │           └── 538723СТЕПАНОВ_ОТЧЕТ_ЛР3.docx / .ipynb / .pdf
 │
-├── OOP/                                     # Объектно-ориентированное программирование (C++, SDL3)
+├── OOP/                                     # Объектно-ориентированное программирование (C++20, SDL3)
+│   ├── README.md                            # описание игры, скриншоты, UML
+│   ├── docs/
+│   │   ├── screenshots/                     # скриншоты всех трёх версий
+│   │   └── uml/                             # диаграммы классов, генератор, исходник PlantUML
+│   │
 │   ├── lab 1/                               # игра с роботами на игровом поле + редактор карт
 │   │   ├── отчет.docx
-│   │   ├── src/
-│   │   │   ├── CMakeLists.txt
-│   │   │   ├── main.cpp
-│   │   │   ├── GUI.cpp, GameSession.cpp, Game_board.cpp,
-│   │   │   │   MapEditor.cpp, Robot.cpp, Robot_factory.cpp
-│   │   │   ├── include/                     # Direction.h, GUI.h, GameSession.h, Game_board.h,
-│   │   │   │                                # MapEditor.h, Robot.h, Robot_factory.h
-│   │   │   └── fonts/Samson.ttf
-│   │   └── vendor/                          # сторонние библиотеки (исходники)
-│   │       ├── CMakeLists.txt
-│   │       ├── SDL/                         # SDL3
-│   │       └── SDL_ttf/                     # SDL3_ttf
+│   │   ├── src/                             # Robot, Robot_factory, Game_board,
+│   │   │                                    # GameSession, MapEditor, GUI
+│   │   └── vendor/                          # сторонние библиотеки: SDL3, SDL3_ttf
 │   │
-│   └── lab 2/                               # развитие игры: способности, статусы, предметы, ИИ врагов
-│       ├── CMakeLists.txt
-│       ├── Отчет ЛР2.docx
+│   ├── lab 2/                               # способности, статусы, предметы, ИИ врагов
+│   │   ├── CMakeLists.txt
+│   │   ├── Отчет ЛР2.docx
+│   │   └── src/                             # abilities, board, game, gui, items,
+│   │                                        # robot, statuses, assets, fonts
+│   │
+│   └── lab 3/                               # шаблонная игра: режимы, меню, сложность,
+│       ├── CMakeLists.txt                   # сохранение, журнал, настраиваемое управление
+│       ├── Отчет ЛР3.docx
 │       └── src/
-│           ├── CMakeLists.txt
-│           ├── main.cpp
-│           ├── abilities/                   # Ability_catalog, Around_attack, Heal,
-│           │                                # Long_attack, Teleport, Robot_abilities
-│           ├── board/                       # Game_board, Cell_status_generator, Direction
-│           ├── game/                        # Game_session, Game_template, Demo_level,
-│           │                                # Enemy_controller, Event_log, Map_editor, Level_result
-│           ├── gui/                         # Gui, Canvas, Layout, Palette, Assets, Sprite_catalog,
-│           │                                # Board_view, Hud_view, Dialog_view,
-│           │                                # Display_mode(_selector), Player_controller
-│           ├── items/                       # Item, Inventory, Attack/Energy/Health_potion
-│           ├── robot/                       # Robot, Robot_factory, Relation
-│           ├── statuses/                    # Base_status, Status_list, Burn, Shield, Slow,
-│           │                                # Strength, Overload, Item_pickup, Robot_status
-│           ├── fonts/Samson.ttf
-│           └── assets/Tiny Swords (Free Pack)/  # спрайты: Buildings, Particle FX,
-│                                                # Terrain, UI Elements, Units
+│           ├── program/                     # Program, Command_line_options — точка входа
+│           ├── game/                        # Application, Game_template, Game_session,
+│           │                                # генераторы уровней, сложность
+│           ├── input/                       # Sdl_input, Key_bindings
+│           ├── gui/                         # Sdl_renderer, Board_view, Hud_view, Dialog_view
+│           ├── save/                        # сериализация и проверка сохранений
+│           ├── logging/                     # Logger, File_logger<Output>, Log_settings
+│           ├── robot/, board/, abilities/, statuses/, items/
+│           ├── levels/                      # level_1.txt … level_3.txt
+│           ├── controls.txt                 # раскладка клавиш
+│           ├── assets/                      # спрайты Tiny Swords (Free Pack)
+│           └── fonts/Samson.ttf
 │
 ├── ORGEVM/                                  # Организация ЭВМ и систем (ассемблер)
 │   └── lab 1/
@@ -105,10 +235,7 @@ university-works/
 │
 ├── Physics/                                 # Физика
 │   └── 2 sem/
-│       ├── lab 1.docx
-│       ├── lab 4.docx
-│       ├── lab 9.docx
-│       └── lab 12.docx
+│       └── lab 1.docx, lab 4.docx, lab 9.docx, lab 12.docx
 │
 └── Programming/                             # Программирование (C)
     ├── Semester 1/
@@ -134,8 +261,7 @@ university-works/
     │           ├── main.c
     │           ├── one.c, two.c, three.c, four.c,
     │           │   pred_obrabotka.c, slon_tools.c
-    │           └── include/                 # one.h, two.h, three.h, four.h,
-    │                                        # pred_obrabotka.h, slon_tools.h
+    │           └── include/                 # заголовки модулей
     │
     └── Semester 2/
         ├── Labatory work 1/src/main.c       # регулярные выражения (regex.h)
@@ -153,69 +279,40 @@ university-works/
                 └── include/png_utils.h
 ```
 
-### 📄 Описание содержимого
-
-- **Algorithms (Алгоритмы и структуры данных)** — реализация структур данных и алгоритмов на C++ с тестами, бенчмарками и графиками
-- **Computer Science (Информатика)** — лабораторные работы на Python (NumPy, Pillow, ООП, scikit-learn)
-- **OOP (Объектно-ориентированное программирование)** — пошаговая игра с роботами на C++20 с графикой на SDL3
-- **ORGEVM (Организация ЭВМ)** — лабораторные работы на ассемблере
-- **Physics (Физика)** — отчёты по лабораторным работам
-- **Programming (Программирование)** — лабораторные и курсовые работы на C
-- **Job_condition.md** — условие задания лабораторной работы
-- **src/** — исходный код решения
-- **\*.docx / \*.pdf / \*.ipynb** — отчёты по работам
-- **vendor/** — исходники сторонних библиотек (SDL3, SDL3_ttf), не авторский код
-
-### 🔨 Сборка
-
-- Проекты на C/C++ с `CMakeLists.txt` (Algorithms, OOP):
-  ```
-  cmake -S . -B build
-  cmake --build build
-  ```
-- Проекты с `Makefile` (Programming): `make` в папке `src/`
-- Python-работы: `python3 main.py`
+</details>
 
 ---
 
-## 🇬🇧 Description (English)
+## 🔨 Сборка и запуск
 
-This repository contains academic works completed during studies at  
-**Saint Petersburg Electrotechnical University “LETI” (SPbETU LETI)**.  
-Faculty of **Computer Technologies and Informatics (CTI)**.  
-Program **Applied Mathematics and Informatics**.
+| Тип проекта | Где | Команды |
+|---|---|---|
+| CMake (C++) | `Algorithms/*`, `OOP/*` | `cmake -S . -B build && cmake --build build` |
+| Makefile (C) | `Programming/*/src` | `make` |
+| Python | `Computer Science/*/src` | `python3 main.py` |
 
-The repository is intended for storing and organizing laboratory, practical and course works for various university courses.
-
-### 📁 Repository Structure
-
-The full file tree is shown in the Russian section above. Top-level overview:
-
-```
-university-works/
-├── Algorithms/          # lab 1 (circular deque), lab 2 (Timsort) — C++, CMake, GoogleTest
-├── Computer Science/    # 1 Semester (labs 1–3), 2 Semester (labs 1–3) — Python
-├── OOP/                 # lab 1, lab 2 — robot game in C++20 with SDL3
-├── ORGEVM/              # lab 1 — assembly
-├── Physics/             # 2 sem — lab reports (.docx)
-└── Programming/         # Semester 1 (labs 1–4, coursework), Semester 2 (labs 1–4, coursework) — C
-```
-
-### 📄 Content Description
-
-- **Algorithms** — data structures and algorithms in C++ with tests, benchmarks and plots
-- **Computer Science** — Python labs (NumPy, Pillow, OOP, scikit-learn)
-- **OOP** — turn-based robot game in C++20 using SDL3
-- **ORGEVM** — computer organization labs in assembly
-- **Physics** — physics lab reports
-- **Programming** — C labs and course works
-- **Job_condition.md** — task description and requirements
-- **src/** — source code of the solution
-- **\*.docx / \*.pdf / \*.ipynb** — reports
-- **vendor/** — third-party library sources (SDL3, SDL3_ttf), not authored code
+> [!TIP]
+> Подробная инструкция для OOP lab 3, включая подключение SDL и аргументы командной строки, — в [OOP/README.md](OOP/README.md#-сборка-и-запуск).
 
 ---
 
-## 📌 Notes
+## 🇬🇧 English
 
-All materials in this repository were created for educational purposes as part of the university curriculum.
+Academic works completed at **Saint Petersburg Electrotechnical University "LETI"**: Faculty of Computer Technologies and Informatics, program *Applied Mathematics and Informatics*.
+
+| | Course | Stack | Highlights |
+|:-:|---|---|---|
+| 🎮 | [Object-Oriented Programming](OOP) | C++20, SDL3, CMake | **Robot Tactics**, a turn-based tactics game built over 3 labs: class templates, save/load with checksums, logging, configurable key bindings, 83 classes with a full [UML diagram](OOP/README.md#-uml-диаграмма-всего-кода) |
+| 🧮 | [Algorithms & Data Structures](Algorithms) | C++, GoogleTest | Circular deque, Timsort with galloping mode; unit tests and benchmarks |
+| 💻 | [Programming](Programming) | C, Make | 8 labs and 2 course works: text processing, regex, directory traversal, a CLI PNG editor |
+| 🐍 | [Computer Science](Computer%20Science) | Python | NumPy, Pillow, OOP, linked list, scikit-learn (Iris) |
+| 🔌 | [Computer Organization](ORGEVM) | x86 Assembly | First assembly programs |
+| 🔬 | [Physics](Physics) | — | Lab reports |
+
+Each work lives in its own folder: source code in `src/`, the report (`.docx` / `.pdf`) next to it, and the task statement (`Job_condition.md`) where available. `vendor/` folders contain third-party library sources (SDL3, SDL3_ttf), not authored code.
+
+---
+
+<div align="center">
+<sub>Все материалы созданы в учебных целях · All materials were created for educational purposes</sub>
+</div>
