@@ -243,8 +243,6 @@ flowchart LR
 ```bash
 cd OOP
 python3 docs/uml/gen_uml.py "lab 3/src" docs/uml/lab3_full.puml
-java -DPLANTUML_LIMIT_SIZE=32768 -jar plantuml.jar -tsvg -charset UTF-8 docs/uml/lab3_full.puml
-java -DPLANTUML_LIMIT_SIZE=32768 -jar plantuml.jar -tpng -charset UTF-8 docs/uml/lab3_full.puml
 ```
 
 </details>
