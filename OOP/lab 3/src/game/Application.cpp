@@ -51,7 +51,6 @@ void Application::handle_menu(Command command) {
 	}
 	string error;
 	if (!load_game(error)) {
-		// ошибка в файле сохранения — сообщаем и остаёмся в меню
 		show_message("Error", error);
 	}
 }
@@ -70,7 +69,6 @@ void Application::handle_difficulty(Command command) {
 	try {
 		game = modes_.create_new(pending_mode_, difficulty, &game_listener_);
 	} catch (const exception& error) {
-		// например, нет файла фиксированного уровня
 		logger_.log(Log_level::Program_error, string("Cannot start a new game: ") + error.what());
 		show_message("Error", error.what());
 		return;
@@ -93,7 +91,6 @@ void Application::handle_game(Command command) {
 	try {
 		game_->handle(command);
 	} catch (const exception& error) {
-		// например, не удалось прочитать файл следующего уровня
 		logger_.log(Log_level::Program_error, string("Game stopped: ") + error.what());
 		game_.reset();
 		show_message("Error", error.what());
@@ -157,7 +154,6 @@ bool Application::load_game(string& error) {
 		game = save_slot_.load(&game_listener_);
 	} catch (const exception& load_error) {
 		error = load_error.what();
-		// текущая игра (если есть) заменяется только после успешной загрузки
 		logger_.log(Log_level::Program_error, "Load failed: " + error
 					+ (game_ != nullptr ? "; current game is kept" : string()));
 		return false;

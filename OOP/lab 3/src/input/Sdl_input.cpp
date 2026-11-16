@@ -11,7 +11,6 @@ Sdl_input::Sdl_input(const string& config_path) {
 	SDL_InitSubSystem(SDL_INIT_EVENTS);
 	try {
 		Key_bindings loaded(config_path);
-		// названия клавиш проверяет SDL
 		for (const auto& binding : loaded.get_labels().get_all()) {
 			if (SDL_GetScancodeFromName(loaded.get_key_name(binding.second).c_str()) == SDL_SCANCODE_UNKNOWN) {
 				throw runtime_error("unknown key '" + binding.second + "' for command '"
@@ -46,7 +45,6 @@ bool Sdl_input::read_command(Command& command) {
 
 string Sdl_input::get_combo(const SDL_KeyboardEvent& key) const {
 	string combo;
-	// сама клавиша-модификатор (Left Shift и т.п.) нажимается без префиксов
 	if (key.scancode < SDL_SCANCODE_LCTRL || key.scancode > SDL_SCANCODE_RGUI) {
 		if (key.mod & SDL_KMOD_CTRL) {
 			combo += "Ctrl+";

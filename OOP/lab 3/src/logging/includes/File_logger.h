@@ -9,11 +9,6 @@
 #include "Single_file_output.h"
 #include "Split_file_output.h"
 
-// Журнал программы в файлах. Параметр шаблона Output задаёт, куда пишутся
-// записи: Single_file_output — всё в один файл, Split_file_output —
-// информация и ошибки в разные файлы. Output должен иметь конструктор
-// от каталога и метод void write(Log_level level, const std::string& line).
-// Записи выключенных в settings уровней отбрасываются.
 template <typename Output>
 class File_logger : public Logger {
 private:

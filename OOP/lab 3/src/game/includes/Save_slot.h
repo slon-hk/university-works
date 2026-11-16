@@ -10,7 +10,6 @@
 #include "Game_mode_catalog.h"
 
 // Файл сохранения: запись текущей игры и сборка игры нужного режима
-// из прочитанного состояния.
 class Save_slot {
 private:
 	std::string path_;
@@ -22,9 +21,9 @@ public:
 
 	const std::string& get_path() const;
 	bool exists() const;
-	// бросает runtime_error, если сохранить нельзя; прежний файл не портится
+	// бросает runtime_error, если сохранить нельзя
 	void save(const Game& game) const;
-	// бросает runtime_error при ошибке чтения или проверки, ничего не меняя
+	// бросает runtime_error при ошибке чтения или проверки
 	std::unique_ptr<Game> load(Game_event_listener* listener) const;
 };
 

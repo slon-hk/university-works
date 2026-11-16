@@ -10,15 +10,12 @@
 
 using namespace std;
 
-// Границы проверяемых значений
 const long long kMaxTurns = 1000000;
 const long long kMaxFactoryLevel = 1000000;
 const long long kMaxRobots = 10000;
 const long long kMaxFactoryCount = 1000;
 const long long kMaxRobotsPerSpawn = 100;
 const long long kMaxSpawnPeriod = 1000;
-
-// ---------- запись
 
 void Session_serializer::write(Save_writer& out, const Game_session& session) const {
 	out.write_key("progress");

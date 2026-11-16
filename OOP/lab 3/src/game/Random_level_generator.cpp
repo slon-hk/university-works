@@ -10,10 +10,8 @@ using namespace std;
 
 const int kBoardSize = 32;
 const int kPlacementAttempts = 1000;
-// враги и заводы появляются не ближе этого расстояния к игроку
 const int kSafeDistance = 8;
 
-// Рост сложности с номером уровня (n — номер, начиная с 1).
 // стен: 6 + n, но не больше 16
 const int kBaseWalls = 6;
 const int kMaxWalls = 16;
@@ -82,7 +80,7 @@ bool Random_level_generator::find_free_cell(const Occupancy& used, int size, int
 	for (int attempt = 0; attempt < kPlacementAttempts; attempt++) {
 		int x = rand() % (kBoardSize - size + 1);
 		int y = rand() % (kBoardSize - size + 1);
-		// расстояние по большей из осей, как у радиусов в игре
+
 		if (max(abs(x - from_x), abs(y - from_y)) < min_distance) {
 			continue;
 		}

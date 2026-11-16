@@ -8,11 +8,8 @@
 
 using namespace std;
 
-// энергия, восстанавливаемая в конце каждого хода
 const int kEnergyPerTurn = 10;
-// сколько очков движения стоит атака/лечение соседа
 const int kInteractionCost = 1;
-// опыт за разрушение завода
 const int kExperienceForFactory = 50;
 
 Game_session::Game_session(Game_board board)
@@ -24,12 +21,10 @@ void Game_session::add_robot(Robot robot, int x, int y) {
 	if (!is_cell_free(x, y)) {
 		throw runtime_error("Robot must be placed on a free passable cell");
 	}
-	// игрок — первый робот; награды начисляются за ранги выше стартового
 	if (robots_.is_empty()) {
 		rewards_.set_rewarded_rank((int) robot.get_rank());
 	}
 	vector<shared_ptr<Robot_abilities>> abilities;
-	// каждый враг получает одну случайную способность
 	if (robot.get_relation() == Relation::Enemy) {
 		abilities.push_back(ability_catalog_.create_enemy_ability());
 	}
@@ -123,7 +118,7 @@ bool Game_session::act(int index, Direction direction) {
 		}
 		return false;
 	}
-	// в клетке стоит робот — вместо перемещения взаимодействуем с ним
+
 	int target_index = robots_.find_at(new_x, new_y);
 	if (target_index >= 0) {
 		return interact(index, target_index);
@@ -190,8 +185,7 @@ bool Game_session::step(int index, int x, int y, const string& target_cell) {
 		}
 		return false;
 	}
-	// стоимость входа ограничиваем скоростью, иначе медленный робот
-	// никогда не смог бы зайти на «дорогую» клетку
+
 	int cost = board_.get_square_speed_level(x, y);
 	if (cost > (int) mover.get_speed()) {
 		cost = (int) mover.get_speed();
@@ -222,8 +216,7 @@ void Game_session::enter_cell(int index) {
 	for (size_t i = 0; i < statuses.size(); i++) {
 		apply_status(index, statuses[i]->clone());
 	}
-	// робот получает копии всех статусов клетки, а с самой клетки
-	// исчезает один случайный
+
 	board_.remove_random_square_status(x, y);
 }
 
@@ -232,7 +225,7 @@ void Game_session::end_turn() {
 		return;
 	}
 	trace_event("Player ends turn " + to_string(turn_) + ", other robots act");
-	// порядок важен: сначала действуют враги, затем срабатывают статусы
+
 	enemy_controller_.run_turn(*this);
 	process_statuses();
 	spawn_from_factories();
@@ -285,7 +278,6 @@ void Game_session::spawn_from_factories() {
 }
 
 bool Game_session::find_free_cell_around(int factory_index, int& out_x, int& out_y) const {
-	// обходим кольцо клеток вокруг квадрата завода
 	int size = factories_.get_factory(factory_index).get_size();
 	int left = factories_.get_x(factory_index);
 	int top = factories_.get_y(factory_index);
@@ -319,7 +311,6 @@ void Game_session::update_visibility() {
 		int y = cells[i].second;
 		bool in_view = robots_.is_in_radius(kPlayerIndex, x, y, radius);
 		board_.set_square_visible(x, y, in_view);
-		// увиденные препятствия запоминаются и остаются видны в тумане
 		if (in_view && board_.get_square_border(x, y)) {
 			board_.set_square_discovered(x, y, true);
 		}
@@ -375,7 +366,6 @@ void Game_session::damage_factory(int user_index, int factory_index, int damage)
 	size_t rank_before = robots_.get_robot(user_index).get_rank();
 	robots_.get_robot(user_index).change_experience(kExperienceForFactory);
 	report_rank_up(user_index, rank_before);
-	// клетки завода освобождаются
 	factories_.remove(factory_index);
 }
 
@@ -408,7 +398,7 @@ bool Game_session::use_ability(int user_index, int ability_index, int target_x, 
 		}
 		return false;
 	}
-	// Overload срывает применение, но энергия при этом не тратится
+
 	if (!user.try_activate_ability()) {
 		log_event(robots_.get_name(user_index) + " is overloaded: " + ability->get_name() + " failed");
 		return false;
@@ -455,7 +445,6 @@ void Game_session::log_health_loss(const string& prefix, int target_index, int h
 	int health_delta = (int) target.get_current_health() - health_before;
 	string text = prefix + robots_.get_name(target_index) + ": " + to_string(health_delta) + " HP";
 
-	// потеряно меньше HP, чем нанесено урона, — значит, часть поглотил щит
 	if (target.is_alive() && -health_delta < damage) {
 		text += " (shield)";
 	}
@@ -481,8 +470,7 @@ void Game_session::apply_status(int index, shared_ptr<Robot_status> status) {
 	if (status == nullptr || !robots_.get_robot(index).is_alive()) {
 		return;
 	}
-	// статус может сработать мгновенно и сразу истечь (например, подбор предмета) —
-	// тогда на робота его не вешаем
+
 	status->on_apply(*this, index);
 
 	if (status->is_expired()) {
@@ -528,7 +516,7 @@ bool Game_session::use_item(int slot) {
 		log_error(inventory_.get_item(slot).get_name() + ": can't use now");
 		return false;
 	}
-	// предмет одноразовый: убираем из инвентаря и применяем
+
 	shared_ptr<Item> item = inventory_.take_item(slot);
 	log_event("Player uses " + item->get_name());
 	item->use(*this, kPlayerIndex);
@@ -547,13 +535,10 @@ void Game_session::set_player_state(const Player_state& state) {
 	if (robots_.is_empty()) {
 		throw runtime_error("Player must be placed before setting its state");
 	}
-	// координаты остаются от нового уровня, всё остальное — из state
 	robots_.get_robot(kPlayerIndex) = state.get_robot();
 	robots_.set_abilities(kPlayerIndex, state.get_abilities());
 	inventory_ = state.get_inventory();
-	// награды за уже достигнутые ранги игрок получил на прошлых уровнях
 	rewards_.set_rewarded_rank((int) state.get_robot().get_rank());
-	// у перенесённого робота может быть другой радиус обзора
 	update_visibility();
 }
 

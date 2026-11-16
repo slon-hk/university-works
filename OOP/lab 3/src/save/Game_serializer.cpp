@@ -13,8 +13,8 @@ using namespace std;
 
 // Формат файла:
 //   ROBOT_GAME_SAVE <версия>
-//   checksum <FNV-1a от всего, что ниже>
-//   mode, level, controller, состояние уровня (см. Session_serializer), end
+//   checksum
+//   mode, level, controller, состояние уровня, end
 // Строки записываются как "<длина> <символы>".
 const string kHeader = "ROBOT_GAME_SAVE";
 const int kVersion = 2;
@@ -54,9 +54,7 @@ void Game_serializer::save(const Game& game, const string& path) const {
 		throw runtime_error("the game can be saved only when the player can act");
 	}
 	string body = write_body(game);
-
-	// пишем во временный файл и подменяем им сохранение, чтобы сбой
-	// записи не испортил прежний файл
+	
 	string temp_path = path + ".tmp";
 	{
 		ofstream out(temp_path, ios::binary);

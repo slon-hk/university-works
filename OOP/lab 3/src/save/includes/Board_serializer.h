@@ -6,8 +6,6 @@
 #include "Save_writer.h"
 #include "Status_serializer.h"
 
-// Запись и чтение поля: размер и по строке на каждую клетку (стоимость
-// прохода, препятствие, разведана ли) со статусами клетки.
 class Board_serializer {
 private:
 	Status_serializer statuses_;

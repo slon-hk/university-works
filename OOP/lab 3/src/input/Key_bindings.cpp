@@ -53,7 +53,6 @@ Key_bindings::Key_bindings(const string& path) {
 }
 
 void Key_bindings::parse_line(const string& line, int line_number) {
-	// первое слово — команда, остаток строки — название клавиши
 	size_t space = line.find_first_of(" \t");
 	if (space == string::npos) {
 		throw runtime_error("line " + to_string(line_number) + ": expected '<command> <key>'");
@@ -94,7 +93,7 @@ bool Key_bindings::cut_modifier(string& combo, int& modifier) const {
 		if (upper.compare(0, length, kKeyModifierNames[i]) != 0) {
 			continue;
 		}
-		// после модификатора должен идти '+' и ещё хотя бы одна клавиша
+
 		size_t plus = upper.find_first_not_of(" \t", length);
 		if (plus == string::npos || upper[plus] != '+' || trim(upper.substr(plus + 1)).empty()) {
 			continue;

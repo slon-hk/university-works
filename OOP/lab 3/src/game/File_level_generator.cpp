@@ -30,8 +30,7 @@ Game_session File_level_generator::create(int level_number, const Difficulty& di
 	vector<string> rows;
 	string line;
 	while (getline(in, line)) {
-		// файлы, сохранённые в Windows, оканчивают строки на \r
-		if (!line.empty() && line.back() == '\r') {
+		if (!line.empty() && line.back() == '\n') {
 			line.pop_back();
 		}
 		if (!line.empty()) {

@@ -5,7 +5,6 @@
 
 #include "Log_level.h"
 
-// Интерфейс журнала программы: куда и как писать, решает реализация.
 class Logger {
 public:
 	virtual ~Logger() = default;

@@ -11,7 +11,6 @@ const long long kMaxRobotStatuses = 10;
 void Robot_serializer::write(Save_writer& out, const Robot& robot) const {
 	out.write_int(robot.get_current_health());
 	out.write_int(robot.get_max_health());
-	// бонусы к атаке дадут сами статусы после загрузки
 	out.write_int(robot.get_attack_power() - robot.get_attack_bonus());
 	out.write_int(robot.get_current_energy());
 	out.write_int(robot.get_max_energy());

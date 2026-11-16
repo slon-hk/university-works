@@ -38,7 +38,6 @@ unique_ptr<Game> Game_mode_catalog::create(int index) const {
 unique_ptr<Game> Game_mode_catalog::create_new(int index, const Difficulty& difficulty,
 											   Game_event_listener* listener) const {
 	unique_ptr<Game> game = create(index);
-	// слушатель подключается до старта, чтобы попали события первого уровня
 	game->set_event_listener(listener);
 	game->start_new(difficulty);
 	return game;

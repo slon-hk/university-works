@@ -19,7 +19,6 @@ void Status_serializer::write(Save_writer& out, const Robot_status& status) cons
 	string name = status.get_name();
 	out.write_string(name);
 	if (name == "Item") {
-		// у предмета на клетке описание — имя предмета
 		out.write_string(status.get_description());
 	} else if (name == "Burn") {
 		const Burn* burn = dynamic_cast<const Burn*>(&status);

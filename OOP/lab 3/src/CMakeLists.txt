@@ -1,3 +1,35 @@
+cmake_minimum_required(VERSION 3.20)
+
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    project(OOP_Project LANGUAGES CXX)
+
+    set(CMAKE_CXX_STANDARD 20)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../vendor/CMakeLists.txt")
+        add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../vendor" "${CMAKE_BINARY_DIR}/vendor")
+    elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../lab 1/vendor/CMakeLists.txt")
+        add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../lab 1/vendor" "${CMAKE_BINARY_DIR}/vendor")
+    else()
+        message(FATAL_ERROR "Не найден vendor/ в проекте. Откройте корневую папку проекта в CLion.")
+    endif()
+endif()
+
+foreach(sdl_target SDL3-shared SDL3_ttf-shared)
+    if(TARGET ${sdl_target})
+        get_target_property(sdl_link_options ${sdl_target} LINK_OPTIONS)
+        if(sdl_link_options)
+            set(cleaned_link_options "")
+            foreach(opt IN LISTS sdl_link_options)
+                string(REGEX REPLACE "^SHELL:-Wl,-exported_symbols_list,(.*)$" "-Xlinker;-exported_symbols_list;-Xlinker;\\1" fixed_opt "${opt}")
+                list(APPEND cleaned_link_options "${fixed_opt}")
+            endforeach()
+            set_target_properties(${sdl_target} PROPERTIES LINK_OPTIONS "${cleaned_link_options}")
+        endif()
+    endif()
+endforeach()
+
 add_executable(${PROJECT_NAME}
         abilities/includes/Ability_catalog.h
         abilities/includes/Around_attack.h

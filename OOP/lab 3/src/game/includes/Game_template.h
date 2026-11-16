@@ -17,21 +17,14 @@
 // значение Level_count для бесконечного режима
 const int kEndless_levels = 0;
 
-// Игра из нескольких уровней: инициализация, переход между уровнями
-// и завершение игры победой или поражением. Ввода, отрисовки и работы
-// с файлами здесь нет — игра получает готовые команды через handle()
-// и отдаёт состояние; сохранение и загрузка выполняются снаружи.
-//
-// Level_generator — класс, создающий уровни. Должен иметь
+// Level_generator
 //   std::string get_name() const;
-//   Game_session create(int level_number, const Difficulty& difficulty) const; // уровни с 1
-// Level_count — количество уровней или kEndless_levels: тогда уровни
-// не кончаются и игра идёт до поражения.
-//
+//   Game_session create(int level_number, const Difficulty& difficulty) const;
+// Level_count — количество уровней или kEndless_levels
+
 // При переходе на следующий уровень игрок сохраняет ранг, опыт, здоровье,
-// способности с улучшениями и инвентарь; энергия восстанавливается, статусы
-// снимаются (кроме модификатора сложности Statuses_persist). Сложность
-// задаётся при старте и действует на все уровни.
+// способности с улучшениями и инвентарь; энергия восстанавливается, статусы снимаются (кроме модификатора сложности Statuses_persist).
+
 template <typename Level_generator, int Level_count>
 class Game_template : public Game {
 	static_assert(Level_count >= 0, "Level_count must be positive or kEndless_levels");
@@ -41,7 +34,6 @@ private:
 	Command_slots slots_;
 	Difficulty difficulty_;
 	int level_;
-	// контроллер ссылается на сессию, поэтому оба пересоздаются на каждом уровне
 	std::unique_ptr<Game_session> session_;
 	std::unique_ptr<Player_controller> controller_;
 	Display_mode_selector display_mode_;
@@ -67,13 +59,18 @@ private:
 		session_->set_player_state(player);
 		session_->log_event(get_level_title());
 		session_->log_event("Difficulty: " + difficulty_.get_name());
-		for (Modifier modifier : difficulty_.get_modifiers()) {
+		const auto modifiers = difficulty_.get_modifiers();
+		for (std::size_t i = 0; i < modifiers.size(); ++i) {
+			const Modifier& modifier = modifiers[i];
 			session_->log_event("  " + difficulty_.get_modifier_description(modifier));
 		}
 		controller_ = std::make_unique<Player_controller>(*session_);
-		// на первом уровне у игрока ещё нет способностей
 		bool has_abilities = session_->get_robots().get_ability_count(Game_session::kPlayerIndex) > 0;
-		phase_ = has_abilities ? Game_phase::Playing : Game_phase::Start_ability;
+		if (has_abilities) {
+			phase_ = Game_phase::Playing;
+		} else {
+			phase_ = Game_phase::Start_ability;
+		}
 	}
 
 	void start_next_level() {
@@ -103,7 +100,6 @@ private:
 
 	void handle_playing(Command command) {
 		bool is_ability = slots_.is_ability(command);
-		// пока не выбрана награда за ранг, принимаем только выбор награды
 		if (session_->has_rank_reward()) {
 			if (is_ability) {
 				controller_->choose_rank_reward(slots_.get_ability_slot(command));
@@ -139,7 +135,6 @@ public:
 	Game_template() : level_(1), phase_(Game_phase::Finished), listener_(nullptr) {
 	}
 
-	// новая игра с первого уровня и стартовым роботом
 	void start_new(const Difficulty& difficulty) override {
 		difficulty_ = difficulty;
 		level_ = 1;
@@ -156,7 +151,7 @@ public:
 			display_mode_.next();
 			return;
 		}
-		// выйти в меню можно в любой момент; прогресс сохранён на начало уровня
+
 		if (command == Command::Menu) {
 			phase_ = Game_phase::Finished;
 			return;
@@ -169,7 +164,6 @@ public:
 		} else if (phase_ == Game_phase::Level_complete) {
 			start_next_level();
 		} else {
-			// Game_over и Victory: любая команда завершает игру
 			phase_ = Game_phase::Finished;
 		}
 	}
@@ -211,7 +205,6 @@ public:
 		}
 	}
 
-	// например "random_5" или "random_endless"
 	std::string get_mode_name() const override {
 		std::string count = is_endless() ? "endless" : std::to_string(Level_count);
 		return generator_.get_name() + "_" + count;
@@ -235,7 +228,8 @@ public:
 			|| session->get_robots().find_ability(Game_session::kPlayerIndex, catalog.get_name(selected_slot)) < 0) {
 			throw std::runtime_error("selected ability is not learned");
 		}
-		// все проверки пройдены — только теперь меняем состояние
+
+
 		std::unique_ptr<Player_controller> controller = std::make_unique<Player_controller>(*session);
 		controller->restore(selected_slot, ability_switched);
 		level_ = level;

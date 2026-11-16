@@ -12,7 +12,6 @@ Difficulty::Difficulty() : level_(Difficulty_level::Normal) {
 }
 
 Difficulty::Difficulty(Difficulty_level level) : level_(level) {
-	// перемешиваем все модификаторы и берём первые несколько
 	vector<Modifier> all;
 	for (int i = 0; i < kModifierCount; i++) {
 		all.push_back((Modifier) i);

@@ -4,7 +4,6 @@
 
 using namespace std;
 
-// ограничение на длину строки в сохранении
 const long long kMaxStringLength = 1000;
 
 Save_reader::Save_reader(const string& text) : in_(text) {
@@ -35,7 +34,6 @@ bool Save_reader::read_bool(const string& what) {
 
 string Save_reader::read_string(const string& what) {
 	long long length = read_int(0, kMaxStringLength, what + " length");
-	// между длиной и символами ровно один пробел
 	if (in_.get() != ' ') {
 		throw runtime_error("bad format of " + what);
 	}

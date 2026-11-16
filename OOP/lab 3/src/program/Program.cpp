@@ -24,7 +24,6 @@ Program::Program(int argc, char* argv[]) : options_(argc, argv) {
 
 void Program::run() {
 	{
-		// LOG_DIR задаётся в CMakeLists.txt
 		Program_logger logger(options_.get_log_settings(), LOG_DIR);
 		logger.log(Log_level::Program_info,
 				   "Program started, log levels: " + options_.get_log_settings().to_string());
@@ -34,19 +33,17 @@ void Program::run() {
 		run_loop(logger);
 		logger.log(Log_level::Program_info, "Program finished");
 	}
-	// SDL закрывается, когда окно и шрифты уже освобождены
 	SDL_Quit();
 }
 
 void Program::run_loop(Program_logger& logger) {
-	// CONTROLS_PATH и SAVE_PATH задаются в CMakeLists.txt
 	Sdl_input input(CONTROLS_PATH);
 	if (input.get_warning().empty()) {
 		logger.log(Log_level::Program_info, string("Controls loaded from ") + CONTROLS_PATH);
 	} else {
 		logger.log(Log_level::Program_error, input.get_warning());
 	}
-	// визуализация получает только подписи клавиш, а не саму систему ввода
+
 	Sdl_renderer renderer(input.get_labels());
 	Application application(SAVE_PATH, logger);
 	if (!input.get_warning().empty()) {

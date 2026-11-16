@@ -23,12 +23,7 @@
 #include "Rank_rewards.h"
 #include "Robot_roster.h"
 
-// Состояние одной игровой партии и игровые правила: перемещение
-// и взаимодействие роботов, конец хода, воздействия способностей,
-// предметов и статусов на мир. Хранение роботов, заводов, журнала
-// и наград за ранг вынесено в отдельные классы; читать их можно через
-// get_robots() / get_factories(), а менять — только действиями ниже,
-// чтобы каждое изменение попало в журнал.
+// Состояние одной игровой партии и игровые правила
 class Game_session {
 private:
 	Game_board board_;
@@ -39,30 +34,23 @@ private:
 	Inventory inventory_;
 	Event_reporter reporter_;
 	Rank_rewards rewards_;
-	int turn_; // номер текущего хода, начиная с 1
-	Difficulty difficulty_; // модификаторы меняют правила ниже
-	bool player_used_ability_; // игрок уже применил способность в этом ходу
+	int turn_;
+	Difficulty difficulty_;
+	bool player_used_ability_;
 
-	// ищет свободную клетку вокруг завода для нового робота
+
 	bool find_free_cell_around(int factory_index, int& out_x, int& out_y) const;
-	// шаг в клетку завода — атака, если завод вражеский
 	bool attack_factory(int index, int factory_index, const std::string& target_cell);
-	// шаг в клетку с роботом — атака врага или лечение союзника
 	bool interact(int index, int target_index);
-	// перемещение в соседнюю свободную клетку
 	bool step(int index, int x, int y, const std::string& target_cell);
 
-	// применяет к роботу статусы клетки, на которую он встал
 	void enter_cell(int index);
-	// Этапы конца хода.
 	void process_statuses();
 	void spawn_from_factories();
 	void restore_robots();
-	// модификатор Random_status_each_turn
+
 	void apply_random_status_to_player();
-	// сообщает о повышении ранга, если он вырос с rank_before
 	void report_rank_up(int index, std::size_t rank_before);
-	// пишет в лог потерю HP (с пометкой о щите) и гибель робота
 	void log_health_loss(const std::string& prefix, int target_index, int health_before, int damage);
 
 public:
@@ -70,20 +58,15 @@ public:
 
 	explicit Game_session(Game_board board);
 
-	// Расстановка объектов; бросают runtime_error, если место занято.
-	// Первый добавленный робот становится игроком.
+	// Расстановка объектов
 	void add_robot(Robot robot, int x, int y);
 	void add_factory(Robot_factory factory, int x, int y);
 
 	// Восстановление состояния (используется системой загрузки).
-	// Робот добавляется как есть, со своими способностями; живой робот
-	// должен стоять на свободной проходимой клетке, иначе runtime_error.
 	void restore_robot(Robot robot, int x, int y, std::vector<std::shared_ptr<Robot_abilities>> abilities);
-	// номер хода (>= 1), ранг, до которого награды уже выданы,
-	// и применял ли игрок способность в этом ходу
 	void restore_progress(int turn, int rewarded_rank, bool player_used_ability);
 	void restore_inventory(const Inventory& inventory);
-	// заменяет журнал; лишние старые записи отбрасываются
+
 	void restore_log(const std::vector<std::string>& entries);
 
 	// сложность и её модификаторы (задаются при создании уровня)

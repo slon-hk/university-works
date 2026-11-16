@@ -4,14 +4,11 @@
 #include <sstream>
 #include <string>
 
-// Запись текста сохранения по словам — пара к Save_reader. Слова в строке
-// разделяются пробелом, строки текста записываются как "<длина> <символы>".
 class Save_writer {
 private:
 	std::ostringstream out_;
 	bool line_start_;
 
-	// пробел перед каждым словом, кроме первого в строке
 	void separate();
 
 public:
